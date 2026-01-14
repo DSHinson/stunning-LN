@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="LexisNexis.API/LexisNexis.API.csproj" />
+  <Project Path="LexisNexis.BLL/LexisNexis.BLL.csproj" />
+  <Project Path="LexisNexis.Common/LexisNexis.Common.csproj" />
+  <Project Path="LexisNexis.DAL/LexisNexis.DAL.csproj" />
+</Solution>

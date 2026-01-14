@@ -1,0 +1,182 @@
+﻿using LexisNexis.Common.Result;
+using System.Collections.Concurrent;
+using System.Linq.Expressions;
+
+namespace LexisNexis.DAL.InMemory
+{
+    public class InMemoryRepository<T, TKey> : IWriteRepository<T, TKey>, IReadRepository<T, TKey> where T : EntityBase<TKey> where TKey : notnull
+    {
+        private const int _maxWaitMilliseconds = 5000;
+        private readonly ConcurrentDictionary<TKey, T> _store = new();
+        private readonly SemaphoreSlim _semaphore = new(1, 1);
+        //Force a singleton pattern for in-memory repository
+        private static readonly Lazy<InMemoryRepository<T, TKey>> _instance = new(() => new InMemoryRepository<T, TKey>());
+
+        public static InMemoryRepository<T, TKey> Instance => _instance.Value;
+        private InMemoryRepository() { }
+        public InMemoryRepository(ConcurrentDictionary<TKey, T> store) 
+        {
+            _store = store ?? throw new ArgumentNullException(nameof(store));
+        }
+
+        ///<inheritdoc cref="IWriteRepository{T, TKey}.AddAsync(T)"/>
+        public async Task<Result> AddAsync(T entity)
+        {
+            if (entity == null)
+            {
+                return ResultHelpers.ToFailure("Entity cannot be null");
+            }
+
+            if (!await _semaphore.WaitAsync(_maxWaitMilliseconds))
+            {
+                return ResultHelpers.ToFailure("Unable to acquire write lock");
+            }
+
+            try
+            {
+                if (_store.ContainsKey(entity.Id))
+                {
+                    return ResultHelpers.ToFailure("Duplicate Id");
+                }
+
+                _store[entity.Id] = entity;
+
+                return ResultHelpers.ToResult();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        ///<inheritdoc cref="IWriteRepository{T, TKey}.AddAsync(T)"/>
+        public async Task<Result> UpdateAsync(T entity)
+        {
+            if (entity == null)
+            {
+                return ResultHelpers.ToFailure("Entity cannot be null");
+            }
+
+            if (!await _semaphore.WaitAsync(_maxWaitMilliseconds))
+            {
+                return ResultHelpers.ToFailure("Unable to acquire write lock");
+            }
+
+            try
+            {
+                if (!_store.ContainsKey(entity.Id))
+                {
+                    return ResultHelpers.ToFailure("Entity does not exist");
+                }
+
+                _store[entity.Id] = entity;
+                return ResultHelpers.ToResult();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        ///<inheritdoc cref="IWriteRepository{T, TKey}.RemoveAsync(T)"/>
+        public async Task<Result> RemoveAsync(T entity)
+        {
+            if (entity == null)
+            {
+                return ResultHelpers.ToFailure("Entity cannot be null");
+            }
+
+            if (!await _semaphore.WaitAsync(_maxWaitMilliseconds))
+            {
+                return ResultHelpers.ToFailure("Unable to acquire write lock");
+            }
+
+            try
+            {
+                if (!_store.TryRemove(entity.Id, out _))
+                {
+                    return ResultHelpers.ToFailure("Entity does not exist");
+                }
+
+                return ResultHelpers.ToResult();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        ///<inheritdoc cref="IReadRepository{T, TKey}.GetByIdAsync(TKey)"/>
+        public async Task<Result<T>> GetByIdAsync(TKey id)
+        {
+            if (id == null)
+            { 
+               return ResultHelpers.ToFailure<T>("Id cannot be null");
+            }
+
+            if (!await _semaphore.WaitAsync(_maxWaitMilliseconds))
+            {
+                return ResultHelpers.ToFailure<T>("Unable to acquire read lock");
+            }
+
+            try
+            {
+                if (!_store.TryGetValue(id, out T? entity))
+                {
+                    return ResultHelpers.ToFailure<T>("Entity does not exist");
+                }
+
+                return ResultHelpers.ToResult(entity);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        ///<inheritdoc cref="IReadRepository{T, TKey}.GetAllAsync()"/>
+        public async Task<Result<IEnumerable<T>>> GetAllAsync()
+        {
+            if (!await _semaphore.WaitAsync(_maxWaitMilliseconds))
+            {
+                return ResultHelpers.ToFailure<IEnumerable<T>>("Unable to acquire read lock");
+            }
+
+            try
+            {
+                List<T> all = _store.Values.ToList();
+                return ResultHelpers.ToResult<IEnumerable<T>>(all);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        ///<inheritdoc cref="IReadRepository{T, TKey}.FindAsync(Expression{Func{T, bool}})"/>
+        public async Task<Result<IEnumerable<T>>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            if (predicate == null)
+            {
+                return ResultHelpers.ToFailure<IEnumerable<T>>("Predicate cannot be null");
+            }
+
+            if (!await _semaphore.WaitAsync(_maxWaitMilliseconds))
+            {
+                return ResultHelpers.ToFailure<IEnumerable<T>>("Unable to acquire read lock");
+            }
+
+            try
+            {
+                Func<T, bool> compiled = predicate.Compile();
+                List<T> results = _store.Values.Where(compiled).ToList();
+                return ResultHelpers.ToResult<IEnumerable<T>>(results);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+    }
+
+}
