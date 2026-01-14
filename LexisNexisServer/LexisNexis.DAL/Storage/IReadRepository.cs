@@ -1,7 +1,7 @@
 ﻿using LexisNexis.Common.Result;
 using System.Linq.Expressions;
 
-namespace LexisNexis.DAL
+namespace LexisNexis.DAL.Storage
 {
     /// <summary>
     /// Defines a read-only repository interface for retrieving entities by identifier, querying all entities, or

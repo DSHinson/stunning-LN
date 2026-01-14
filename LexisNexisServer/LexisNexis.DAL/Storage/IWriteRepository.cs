@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LexisNexis.DAL
+namespace LexisNexis.DAL.Storage
 {
     /// <summary>
     /// Defines methods for adding, updating, and removing entities in a write-oriented repository.

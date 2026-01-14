@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 
-namespace LexisNexis.DAL.InMemory
+namespace LexisNexis.DAL.Storage.InMemory
 {
     public class InMemoryRepository<T, TKey> : IWriteRepository<T, TKey>, IReadRepository<T, TKey> where T : EntityBase<TKey> where TKey : notnull
     {
