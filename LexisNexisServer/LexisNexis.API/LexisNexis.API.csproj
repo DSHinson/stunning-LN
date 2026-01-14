@@ -10,4 +10,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LexisNexis.BLL\LexisNexis.BLL.csproj" />
+    <ProjectReference Include="..\LexisNexis.Common\LexisNexis.Common.csproj" />
+  </ItemGroup>
+
 </Project>

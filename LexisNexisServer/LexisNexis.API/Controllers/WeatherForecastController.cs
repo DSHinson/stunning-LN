@@ -1,3 +1,5 @@
+using LexisNexis.BLL.Weather;
+using LexisNexis.Common.CQRS;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LexisNexis.API.Controllers
@@ -6,28 +8,22 @@ namespace LexisNexis.API.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        private readonly EventPlayerService _eventPlayerService;
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, EventPlayerService eventPlayerService)
         {
             _logger = logger;
+            _eventPlayerService = eventPlayerService ?? throw new ArgumentNullException(nameof(eventPlayerService));
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task<IEnumerable<WeatherForecast>> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            IEnumerable<WeatherForecast> result = await _eventPlayerService.EmitAsync(new GetWeatherForecastEvent());
+
+            return result;
         }
     }
 }

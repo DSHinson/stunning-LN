@@ -1,3 +1,4 @@
+using LexisNexis.Common.CQRS;
 
 namespace LexisNexis.API
 {
@@ -13,6 +14,8 @@ namespace LexisNexis.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            //TODO: change this to use reflection -> assembly scanning? or perhaps a marker interface on BLL project?
+            builder.Services.AddCqrs(typeof(LexisNexis.BLL.Weather.GetWeatherForecastEvent).Assembly);
 
             var app = builder.Build();
 
