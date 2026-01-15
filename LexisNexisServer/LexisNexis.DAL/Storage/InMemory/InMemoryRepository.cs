@@ -8,40 +8,52 @@ namespace LexisNexis.DAL.Storage.InMemory
     {
         private const int _maxWaitMilliseconds = 5000;
         private readonly ConcurrentDictionary<TKey, T> _store = new();
+        private readonly IIdGenerator<TKey> _idGenerator;
+
         private readonly SemaphoreSlim _semaphore = new(1, 1);
         //Force a singleton pattern for in-memory repository
         private static readonly Lazy<InMemoryRepository<T, TKey>> _instance = new(() => new InMemoryRepository<T, TKey>());
 
         public static InMemoryRepository<T, TKey> Instance => _instance.Value;
         private InMemoryRepository() { }
-        public InMemoryRepository(ConcurrentDictionary<TKey, T> store) 
+        public InMemoryRepository(ConcurrentDictionary<TKey, T> store, IIdGenerator<TKey> idGenerator) 
         {
             _store = store ?? throw new ArgumentNullException(nameof(store));
+            _idGenerator = idGenerator ?? throw new ArgumentNullException(nameof(idGenerator));
         }
 
         ///<inheritdoc cref="IWriteRepository{T, TKey}.AddAsync(T)"/>
-        public async Task<Result> AddAsync(T entity)
+        public async Task<Result<T>> AddAsync(T entity)
         {
             if (entity == null)
             {
-                return ResultHelpers.ToFailure("Entity cannot be null");
+                return ResultHelpers.ToFailure<T>("Entity cannot be null");
             }
 
             if (!await _semaphore.WaitAsync(_maxWaitMilliseconds))
             {
-                return ResultHelpers.ToFailure("Unable to acquire write lock");
+                return ResultHelpers.ToFailure<T>("Unable to acquire write lock");
             }
 
             try
             {
+                //Check for adding a duplicate item
                 if (_store.ContainsKey(entity.Id))
                 {
-                    return ResultHelpers.ToFailure("Duplicate Id");
+                    return ResultHelpers.ToFailure<T>("Duplicate Id");
                 }
 
+                entity = entity with { Id = _idGenerator.Next() };
+
+                //Safety check we didnt some how generate a duplicate id
+                if (_store.ContainsKey(entity.Id))
+                {
+                    return ResultHelpers.ToFailure<T>("Duplicate Id");
+                }
+                
                 _store[entity.Id] = entity;
 
-                return ResultHelpers.ToResult();
+                return ResultHelpers.ToResult(entity);
             }
             finally
             {
@@ -134,8 +146,8 @@ namespace LexisNexis.DAL.Storage.InMemory
             }
         }
 
-        ///<inheritdoc cref="IReadRepository{T, TKey}.GetAllAsync()"/>
-        public async Task<Result<IEnumerable<T>>> GetAllAsync()
+        ///<inheritdoc cref="IReadRepository{T, TKey}.GetAllAsync(Expression{Func{T, bool}}?)"/>
+        public async Task<Result<IEnumerable<T>>> GetAllAsync(Expression<Func<T, bool>>? predicate = null)
         {
             if (!await _semaphore.WaitAsync(_maxWaitMilliseconds))
             {
@@ -144,8 +156,14 @@ namespace LexisNexis.DAL.Storage.InMemory
 
             try
             {
-                List<T> all = _store.Values.ToList();
-                return ResultHelpers.ToResult<IEnumerable<T>>(all);
+                IEnumerable<T> values = _store.Values;
+
+                if (predicate is not null)
+                {
+                    values = values.Where(predicate.Compile());
+                }
+
+                return ResultHelpers.ToResult(values.ToList().AsEnumerable<T>());
             }
             finally
             {

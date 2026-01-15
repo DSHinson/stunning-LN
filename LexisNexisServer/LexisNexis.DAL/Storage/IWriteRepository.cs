@@ -21,7 +21,7 @@ namespace LexisNexis.DAL.Storage
         /// Adds the specified entity to the collection.
         /// </summary>
         /// <param name="entity">The entity to add to the collection. Cannot be null.</param>
-        Task<Result> AddAsync(T entity);
+        Task<Result<T>> AddAsync(T entity);
 
         /// <summary>
         /// Updates the specified entity in the data store.

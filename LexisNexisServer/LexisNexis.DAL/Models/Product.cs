@@ -7,9 +7,13 @@ using System.Threading.Tasks;
 
 namespace LexisNexis.DAL.Models
 {
-    record Product : EntityBase
+    public record Product : EntityBase
     {
-        public required string Name { get; set; } = "";
+        public required string Name { get; set; }
         public int CategoryId { get; set; }
+        public string? Description { get; set; }
+        public string? SKU { get; set; }
+        public decimal Price { get; set; }
+        public int Quantity { get; set; }
     }
 }

@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\LexisNexis.BLL\LexisNexis.BLL.csproj" />
     <ProjectReference Include="..\LexisNexis.Common\LexisNexis.Common.csproj" />
+    <ProjectReference Include="..\LexisNexis.DAL\LexisNexis.DAL.csproj" />
   </ItemGroup>
 
 </Project>

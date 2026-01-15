@@ -26,7 +26,9 @@ namespace LexisNexis.DAL.Storage
         /// </summary>
         /// <returns>An enumerable collection of items of type <typeparamref name="T"/>. The collection will be empty if no items
         /// are present.</returns>
-        Task<Result<IEnumerable<T>>> GetAllAsync();
+        /// <param name="predicate">Optional predicate to filter the results.</param>
+        Task<Result<IEnumerable<T>>> GetAllAsync(Expression<Func<T, bool>>? predicate = null);
+
 
         /// <summary>
         /// Retrieves a collection of entities that satisfy the specified predicate.
