@@ -24,7 +24,7 @@ namespace LexisNexis.BLL.Products
 
            return await _repo.AddAsync(new Product
             {
-                Id = -1,
+                Id = 0,
                 Name = command.Name,
                 CategoryId = command.CategoryId,
                 Description = command.Description,

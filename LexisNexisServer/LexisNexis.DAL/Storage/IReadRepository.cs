@@ -1,4 +1,5 @@
 ﻿using LexisNexis.Common.Result;
+using LexisNexis.DAL.Models;
 using System.Linq.Expressions;
 
 namespace LexisNexis.DAL.Storage

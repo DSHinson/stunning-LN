@@ -1,6 +1,4 @@
-﻿using LexisNexis.API;
-using LexisNexis.BLL.Weather;
-using LexisNexis.Common.CQRS.Query;
+﻿using LexisNexis.Common.CQRS.Query;
 using LexisNexis.Common.Filters;
 using LexisNexis.Common.Result;
 using LexisNexis.DAL.Models;

@@ -1,8 +1,13 @@
+using LexisNexis.API.Helpers;
+using LexisNexis.API.Middleware;
 using LexisNexis.API.Products;
 using LexisNexis.Common.CQRS;
+using LexisNexis.DAL;
 using LexisNexis.DAL.Models;
 using LexisNexis.DAL.Storage;
+using LexisNexis.DAL.Storage.EF;
 using LexisNexis.DAL.Storage.InMemory;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 
 namespace LexisNexis.API
@@ -19,19 +24,28 @@ namespace LexisNexis.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            //TODO: change this to use reflection -> assembly scanning? or perhaps a marker interface on BLL project?
-            builder.Services.AddCqrs(typeof(LexisNexis.BLL.Weather.GetWeatherForecastEvent).Assembly);
-            builder.Services.AddTransient<IIdGenerator<int>, IntIdGenerator>();
-            builder.Services.AddSingleton<ConcurrentDictionary<int,Product>>();
-            builder.Services.AddSingleton<InMemoryRepository<Product, int>>();
+            builder.Services.AddCqrs(typeof(LexisNexis.BLL.AssemblyMarkerForBll).Assembly);
 
-            builder.Services.AddSingleton<IReadRepository<Product, int>>(sp => sp.GetRequiredService<InMemoryRepository<Product, int>>());
-            builder.Services.AddSingleton<IWriteRepository<Product, int>>(sp => sp.GetRequiredService<InMemoryRepository<Product, int>>());
+            bool useEF = true;
+            if (useEF)
+            {
+                builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase("LexisNexisDb"));
+                builder.Services.AddScoped(typeof(IReadRepository<,>), typeof(EfReadRepository<,>));
+                builder.Services.AddScoped(typeof(IWriteRepository<,>), typeof(EfWriteRepository<,>));
+            }
+            else
+            {
+                builder.Services.AddTransient<IIdGenerator<int>, IntIdGenerator>();
+                builder.Services.AddSingleton<ConcurrentDictionary<int, Product>>();
+                builder.Services.AddSingleton<InMemoryRepository<Product, int>>();
+
+                builder.Services.AddSingleton<IReadRepository<Product, int>>(sp => sp.GetRequiredService<InMemoryRepository<Product, int>>());
+                builder.Services.AddSingleton<IWriteRepository<Product, int>>(sp => sp.GetRequiredService<InMemoryRepository<Product, int>>());
+            }
 
             var app = builder.Build();
-
-            app.MapGetProducts();
-            app.MapPostProduct();
+            app.UseMiddleware<RequestContextMiddleware>();
+            app.MapProductsApi();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

@@ -1,4 +1,5 @@
-﻿using LexisNexis.BLL.Products;
+﻿using LexisNexis.API.Helpers;
+using LexisNexis.BLL.Products;
 using LexisNexis.Common.CQRS;
 using LexisNexis.Common.DTO;
 using LexisNexis.Common.Result;
@@ -13,11 +14,8 @@ namespace LexisNexis.API.Products
         /// </summary>
         public static WebApplication MapPostProduct(this WebApplication app)
         {
-            app.MapPost("/api/products", async (EventPlayerService eventPlayerService, CreateProductDto ProductData , HttpContext httpContext) =>
+            app.MapPost("/api/products", async (CreateProductDto ProductData , HttpContext httpContext, EventPlayerService eventPlayerService) =>
             {
-                // Manual model binding
-                //CreateProductDto? dto = await httpContext.Request.ReadFromJsonAsync<CreateProductDto>();
-
                 Result<Product> result = await eventPlayerService.EmitAsync(new CreateProductEvent
                 {
                         Name = ProductData.Name,
@@ -25,16 +23,10 @@ namespace LexisNexis.API.Products
                         SKU = ProductData.SKU,
                         Price = ProductData.Price,
                         Quantity = ProductData.Quantity,
-                    });
+                        CategoryId = ProductData.CategoryId ?? 0
+                });
 
-                if (result is Result<Product>.Failure failure)
-                {
-                    return Results.Problem(failure.FailureMessage);
-                }
-
-                Product product = ((Result<Product>.Success)result).Data;
-
-                return Results.Created($"/api/products/{product.Id}", product);
+                return result.ToApiResponse();
             });
 
             return app;

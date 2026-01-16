@@ -1,4 +1,5 @@
 ﻿using LexisNexis.Common.Result;
+using LexisNexis.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,12 +28,12 @@ namespace LexisNexis.DAL.Storage
         /// Updates the specified entity in the data store.
         /// </summary>
         /// <param name="entity">The entity to update. Cannot be null. The entity must already exist in the data store.</param>
-        Task<Result> UpdateAsync(T entity);
+        Task<Result<T>> UpdateAsync(T entity);
 
         /// <summary>
         /// Removes the specified entity from the collection.
         /// </summary>
-        /// <param name="entity">The entity to remove from the collection. Cannot be null.</param>
-        Task<Result> RemoveAsync(T entity);
+        /// <param name="entity">The entity key to remove from the collection. Cannot be null.</param>
+        Task<Result> RemoveAsync(TKey entityKey);
     }
 }

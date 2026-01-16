@@ -1,4 +1,5 @@
 ﻿using LexisNexis.Common.Result;
+using LexisNexis.DAL.Models;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 
@@ -62,27 +63,27 @@ namespace LexisNexis.DAL.Storage.InMemory
         }
 
         ///<inheritdoc cref="IWriteRepository{T, TKey}.AddAsync(T)"/>
-        public async Task<Result> UpdateAsync(T entity)
+        public async Task<Result<T>> UpdateAsync(T entity)
         {
             if (entity == null)
             {
-                return ResultHelpers.ToFailure("Entity cannot be null");
+                return ResultHelpers.ToFailure<T>("Entity cannot be null");
             }
 
             if (!await _semaphore.WaitAsync(_maxWaitMilliseconds))
             {
-                return ResultHelpers.ToFailure("Unable to acquire write lock");
+                return ResultHelpers.ToFailure<T>("Unable to acquire write lock");
             }
 
             try
             {
                 if (!_store.ContainsKey(entity.Id))
                 {
-                    return ResultHelpers.ToFailure("Entity does not exist");
+                    return ResultHelpers.ToFailure<T>("Entity does not exist");
                 }
 
                 _store[entity.Id] = entity;
-                return ResultHelpers.ToResult();
+                return ResultHelpers.ToResult(entity);
             }
             finally
             {
@@ -91,9 +92,9 @@ namespace LexisNexis.DAL.Storage.InMemory
         }
 
         ///<inheritdoc cref="IWriteRepository{T, TKey}.RemoveAsync(T)"/>
-        public async Task<Result> RemoveAsync(T entity)
+        public async Task<Result> RemoveAsync(TKey entityId)
         {
-            if (entity == null)
+            if (entityId == null)
             {
                 return ResultHelpers.ToFailure("Entity cannot be null");
             }
@@ -105,7 +106,7 @@ namespace LexisNexis.DAL.Storage.InMemory
 
             try
             {
-                if (!_store.TryRemove(entity.Id, out _))
+                if (!_store.TryRemove(entityId, out _))
                 {
                     return ResultHelpers.ToFailure("Entity does not exist");
                 }

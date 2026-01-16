@@ -1,4 +1,4 @@
-﻿namespace LexisNexis.DAL.Storage
+﻿namespace LexisNexis.DAL.Models
 {
     /// <summary>
     /// Provides a base class for entities with a strongly typed identifier.
