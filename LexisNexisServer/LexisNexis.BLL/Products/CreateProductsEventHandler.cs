@@ -30,7 +30,8 @@ namespace LexisNexis.BLL.Products
                 Description = command.Description,
                 SKU = command.SKU,
                 Price = command.Price,
-                Quantity = command.Quantity
+                Quantity = command.Quantity,
+                CreatedAt = DateTime.UtcNow,
            });
 
 

@@ -28,7 +28,8 @@ namespace LexisNexis.BLL.Products
                 SKU = command.SKU,
                 Price = command.Price,
                 Quantity = command.Quantity,
-                CategoryId = command.CategoryId
+                CategoryId = command.CategoryId,
+                UpdatedAt = DateTime.UtcNow
             });
         }
     }
