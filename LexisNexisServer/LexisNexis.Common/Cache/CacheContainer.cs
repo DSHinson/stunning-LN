@@ -9,7 +9,7 @@ namespace LexisNexis.Common.Cache
     public class CacheContainer<T>
     {
         private readonly SemaphoreSlim _lock;
-        public T Result { get; set; }
+        public T Data { get; set; }
         public CacheContainer()
         {
             _lock = new(1, 1);

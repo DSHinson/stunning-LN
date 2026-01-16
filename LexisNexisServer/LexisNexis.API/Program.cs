@@ -1,6 +1,7 @@
 using LexisNexis.API.Helpers;
 using LexisNexis.API.Middleware;
 using LexisNexis.API.Products;
+using LexisNexis.Common.Cache;
 using LexisNexis.Common.CQRS;
 using LexisNexis.DAL;
 using LexisNexis.DAL.Models;
@@ -23,6 +24,9 @@ namespace LexisNexis.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddMemoryCache();
+
+            builder.Services.AddSingleton<ICacheService, CacheService>();
             builder.Services.AddCqrs(typeof(LexisNexis.BLL.AssemblyMarkerForBll).Assembly);
 
             bool useEF = true;
@@ -52,17 +56,24 @@ namespace LexisNexis.API
 
             var app = builder.Build();
 
-            // **Seed categories into the repository**
             using (var scope = app.Services.CreateScope())
             {
                 var categoryRepo = scope.ServiceProvider.GetRequiredService<IWriteRepository<Category, int>>();
-                var seededCategories = CategorySeeder.SeedCategories();
+                var productRepo = scope.ServiceProvider.GetRequiredService<IWriteRepository<Product, int>>();
 
-                foreach (var category in seededCategories)
+                var categories = CategorySeeder.SeedCategories();
+                foreach (var category in categories)
                 {
                     categoryRepo.AddAsync(category).ConfigureAwait(false);
                 }
+
+                var products = ProductSeeder.SeedProducts(categories);
+                foreach (var product in products)
+                {
+                    productRepo.AddAsync(product).ConfigureAwait(false);
+                }
             }
+
 
             app.UseMiddleware<RequestContextMiddleware>();
             app.MapProductsApi();

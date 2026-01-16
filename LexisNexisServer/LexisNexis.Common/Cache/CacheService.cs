@@ -66,7 +66,7 @@ namespace LexisNexis.Common.Cache
                 Guid => 16,
                 DateTime => sizeof(long),
                 string s => Encoding.UTF8.GetByteCount(s),
-                _ => Encoding.UTF8.GetByteCount(value.ToString()!)
+                _ => Encoding.UTF8.GetByteCount((value ?? "").ToString()!)
             };
         }
 
@@ -82,7 +82,7 @@ namespace LexisNexis.Common.Cache
                 Guid g => g.ToByteArray(),
                 DateTime dt => BitConverter.GetBytes(dt.ToBinary()),
                 string s => Encoding.UTF8.GetBytes(s),
-                _ => Encoding.UTF8.GetBytes(value.ToString()!)
+                _ => Encoding.UTF8.GetBytes((value ?? "").ToString()!)
             };
         }
 
