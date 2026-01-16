@@ -4,6 +4,7 @@ using LexisNexis.API.Products;
 using LexisNexis.Common.CQRS;
 using LexisNexis.DAL;
 using LexisNexis.DAL.Models;
+using LexisNexis.DAL.Seed;
 using LexisNexis.DAL.Storage;
 using LexisNexis.DAL.Storage.EF;
 using LexisNexis.DAL.Storage.InMemory;
@@ -33,17 +34,39 @@ namespace LexisNexis.API
             }
             else
             {
+                //Id generator for in memory repos
                 builder.Services.AddTransient<IIdGenerator<int>, IntIdGenerator>();
-                builder.Services.AddSingleton<ConcurrentDictionary<int, Product>>();
-                builder.Services.AddSingleton<InMemoryRepository<Product, int>>();
 
+                //Product 
+                builder.Services.AddSingleton<ConcurrentDictionary<int, Product>>();
+                builder.Services.AddSingleton<InMemoryRepository<Product, int>>(); 
                 builder.Services.AddSingleton<IReadRepository<Product, int>>(sp => sp.GetRequiredService<InMemoryRepository<Product, int>>());
                 builder.Services.AddSingleton<IWriteRepository<Product, int>>(sp => sp.GetRequiredService<InMemoryRepository<Product, int>>());
+
+                //Category
+                builder.Services.AddSingleton<ConcurrentDictionary<int, Category>>();
+                builder.Services.AddSingleton<InMemoryRepository<Category, int>>();
+                builder.Services.AddSingleton<IReadRepository<Category, int>>(sp => sp.GetRequiredService<InMemoryRepository<Category, int>>());
+                builder.Services.AddSingleton<IWriteRepository<Category, int>>(sp => sp.GetRequiredService<InMemoryRepository<Category, int>>());
             }
 
             var app = builder.Build();
+
+            // **Seed categories into the repository**
+            using (var scope = app.Services.CreateScope())
+            {
+                var categoryRepo = scope.ServiceProvider.GetRequiredService<IWriteRepository<Category, int>>();
+                var seededCategories = CategorySeeder.SeedCategories();
+
+                foreach (var category in seededCategories)
+                {
+                    categoryRepo.AddAsync(category).ConfigureAwait(false);
+                }
+            }
+
             app.UseMiddleware<RequestContextMiddleware>();
             app.MapProductsApi();
+            app.MapCategoryApi();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

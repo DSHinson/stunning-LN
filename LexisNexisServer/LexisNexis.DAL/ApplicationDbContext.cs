@@ -43,7 +43,7 @@ namespace LexisNexis.DAL
                 // Self-referencing relationship for parent category
                 entity.HasOne<Category>()
                     .WithMany()
-                    .HasForeignKey(e => e.ParentId)
+                    .HasForeignKey(e => e.ParentCategoryId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
         }

@@ -14,7 +14,7 @@ namespace LexisNexis.API.Products
         /// </summary>
         public static WebApplication MapPostProduct(this WebApplication app)
         {
-            app.MapPost("/api/products", async (CreateProductDto ProductData , HttpContext httpContext, EventPlayerService eventPlayerService) =>
+            app.MapPost("/api/products", async (CreateProductDto ProductData , EventPlayerService eventPlayerService) =>
             {
                 Result<Product> result = await eventPlayerService.EmitAsync(new CreateProductEvent
                 {
