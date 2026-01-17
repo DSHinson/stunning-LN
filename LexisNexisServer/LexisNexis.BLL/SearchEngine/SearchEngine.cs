@@ -69,53 +69,6 @@ namespace LexisNexis.BLL.SearchEngine
             return ResultHelpers.ToResult(scoredItems);
         }
 
-
-        private Expression<Func<T, bool>> BuildPredicate(string query)
-        {
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                return x => true;
-            }
-
-            query = query.Trim().ToLowerInvariant();
-
-            ParameterExpression param = Expression.Parameter(typeof(T), "x");
-            Expression? combined = null;
-
-            foreach (var field in _fields)
-            {
-                // x.Property
-                var propertyExpr = Expression.Invoke(
-                    Expression.Constant(field.Accessor),
-                    param
-                );
-
-                // x.Property != null
-                var notNull = Expression.NotEqual(propertyExpr, Expression.Constant(null, typeof(string)));
-
-                // x.Property.ToLower().Contains(query)
-                var toLowerCall = Expression.Call(
-                    propertyExpr,
-                    typeof(string).GetMethod("ToLower", Type.EmptyTypes)!
-                );
-
-                var containsCall = Expression.Call(
-                    toLowerCall,
-                    typeof(string).GetMethod("Contains", new[] { typeof(string) })!,
-                    Expression.Constant(query)
-                );
-
-                var condition = Expression.AndAlso(notNull, containsCall);
-
-                combined = combined == null ? condition : Expression.OrElse(combined, condition);
-            }
-
-            if (combined == null)
-                combined = Expression.Constant(true); // fallback
-
-            return Expression.Lambda<Func<T, bool>>(combined, param);
-        }
-
         private double ScoreItem(T item, string query)
         {
             double totalScore = 0;
