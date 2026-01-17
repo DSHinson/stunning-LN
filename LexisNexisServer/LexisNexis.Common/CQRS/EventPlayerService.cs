@@ -2,11 +2,7 @@
 using LexisNexis.Common.CQRS.Query;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace LexisNexis.Common.CQRS
 {
@@ -47,7 +43,7 @@ namespace LexisNexis.Common.CQRS
 
         public async Task<TResult> EmitAsync<TResult>(ICommand<TResult> command)
         {
-            var timestamp = DateTime.UtcNow;
+            DateTime timestamp = DateTime.UtcNow;
             _eventLog.Add(new ReplayEntry(command.GetType(), typeof(TResult), command, timestamp));
 
             _logger.LogInformation("Emitting command {CommandType} at {Timestamp}", command.GetType().Name, timestamp);
@@ -67,34 +63,31 @@ namespace LexisNexis.Common.CQRS
         {
             _logger.LogInformation("Starting replay of {Count} events at {Timestamp}", _eventLog.Count, DateTime.UtcNow);
 
-            using var scope = _serviceProvider.CreateScope();
-            var dispatcher = scope.ServiceProvider.GetRequiredService<ICommandDispatcher>();
-
-            foreach (ReplayEntry entry in _eventLog)
+            using (IServiceScope scope = _serviceProvider.CreateScope())
             {
-                EventReplayBehaviorAttribute? attr = entry.Command.GetType()
-                    .GetCustomAttributes(typeof(EventReplayBehaviorAttribute), false)
-                    .FirstOrDefault() as EventReplayBehaviorAttribute;
+                ICommandDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<ICommandDispatcher>();
 
-                if (attr == null || !attr.Options.HasFlag(EventReplayOptions.Replayable))
+                foreach (ReplayEntry entry in _eventLog)
                 {
-                    continue;
+                    EventReplayBehaviorAttribute? attr = entry.Command.GetType().GetCustomAttributes(typeof(EventReplayBehaviorAttribute), false).FirstOrDefault() as EventReplayBehaviorAttribute;
+
+                    if (attr == null || !attr.Options.HasFlag(EventReplayOptions.Replayable))
+                    {
+                        continue;
+                    }
+
+                    _logger.LogInformation("Replaying command {CommandType} originally emitted at {Timestamp}", entry.CommandType.Name, entry.Timestamp);
+
+                    MethodInfo method = typeof(ICommandDispatcher).GetMethod(nameof(ICommandDispatcher.DispatchAsync))!.MakeGenericMethod(entry.ResultType);
+
+                    var task = (Task)method.Invoke(dispatcher, new object[] { entry.Command })!;
+                    await task.ConfigureAwait(false);
+
+                    _logger.LogInformation("Finished replaying command {CommandType} at {Timestamp}", entry.CommandType.Name, DateTime.UtcNow);
                 }
 
-                _logger.LogInformation("Replaying command {CommandType} originally emitted at {Timestamp}",
-                    entry.CommandType.Name, entry.Timestamp);
-
-                MethodInfo method = typeof(ICommandDispatcher).GetMethod(nameof(ICommandDispatcher.DispatchAsync))!
-                    .MakeGenericMethod(entry.ResultType);
-
-                var task = (Task)method.Invoke(dispatcher, new object[] { entry.Command })!;
-                await task.ConfigureAwait(false);
-
-                _logger.LogInformation("Finished replaying command {CommandType} at {Timestamp}",
-                    entry.CommandType.Name, DateTime.UtcNow);
+                _logger.LogInformation("Replay finished at {Timestamp}", DateTime.UtcNow);
             }
-
-            _logger.LogInformation("Replay finished at {Timestamp}", DateTime.UtcNow);
         }
     }
 }
