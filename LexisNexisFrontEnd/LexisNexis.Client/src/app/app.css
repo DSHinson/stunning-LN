@@ -1,0 +1,5 @@
+.content-wrapper {
+    padding-top: 60px; /* Match navbar height */
+    padding-left: 20px;
+    padding-right: 20px;
+}

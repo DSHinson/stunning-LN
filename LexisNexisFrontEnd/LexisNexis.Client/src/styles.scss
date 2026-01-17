@@ -1,0 +1,61 @@
+// ============================================================================
+// IMPORT MATERIAL PREBUILT THEME (replace the @use line)
+// ============================================================================
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+// ============================================================================
+// GLOBAL RESETS
+// ============================================================================
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  padding-top: 64px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+// Dark theme
+body.dark-theme {
+  background-color: #303030;
+  color: rgba(255, 255, 255, 0.87);
+
+  --background-color: #303030;
+  --surface-color: #424242;
+  --card-background: #424242;
+  --text-primary: rgba(255, 255, 255, 0.87);
+  --text-secondary: rgba(255, 255, 255, 0.60);
+  --border-color: rgba(255, 255, 255, 0.12);
+  --shadow-2: 0 4px 8px rgba(0, 0, 0, 0.5);
+  --shadow-3: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+// Light theme
+body.light-theme {
+  background-color: #fafafa;
+  color: rgba(0, 0, 0, 0.87);
+
+  --background-color: #fafafa;
+  --surface-color: #ffffff;
+  --card-background: #ffffff;
+  --text-primary: rgba(0, 0, 0, 0.87);
+  --text-secondary: rgba(0, 0, 0, 0.60);
+  --border-color: rgba(0, 0, 0, 0.12);
+  --shadow-2: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-3: 0 8px 16px rgba(0, 0, 0, 0.14);
+}
+
+// Rest of your utility classes...
+.spacer { flex: 1 1 auto; }
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+// etc...

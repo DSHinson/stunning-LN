@@ -1,0 +1,100 @@
+$mobile-breakpoint: 768px;
+
+.top-menu-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: inherit;
+    font-size: 1.25rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    .logo-icon {
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .logo-text {
+      @media (max-width: 480px) {
+        display: none;
+      }
+    }
+  }
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+
+    @media (max-width: $mobile-breakpoint) {
+      display: none;
+    }
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      text-decoration: none;
+
+      mat-icon {
+        font-size: 1.25rem;
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+
+      &.active {
+        background-color: rgba(255, 255, 255, 0.15);
+      }
+    }
+  }
+
+  .nav-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+
+    @media (max-width: $mobile-breakpoint) {
+      display: none;
+    }
+
+    .login-btn {
+      color: white;
+      border-color: white;
+    }
+
+    .signup-btn {
+      font-weight: 600;
+    }
+  }
+
+  .mobile-menu-button {
+    display: none;
+
+    @media (max-width: $mobile-breakpoint) {
+      display: flex;
+    }
+  }
+}

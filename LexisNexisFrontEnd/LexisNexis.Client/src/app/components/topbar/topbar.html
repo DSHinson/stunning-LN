@@ -1,1 +1,66 @@
-<p>topbar works!</p>
+<mat-toolbar color="primary" class="top-menu-bar">
+  <!-- Logo / Brand -->
+  <a routerLink="/" class="logo">
+    <mat-icon class="logo-icon">category</mat-icon>
+    <span class="logo-text">LexisNexis</span>
+  </a>
+
+  <!-- Spacer -->
+  <span class="spacer"></span>
+
+  <!-- Desktop Navigation Links -->
+  <nav class="nav-links">
+    <a mat-button routerLink="/" routerLinkActive="active">
+      <mat-icon>home</mat-icon>
+      Home
+    </a>
+    <a mat-button routerLink="/products" routerLinkActive="active">
+      <mat-icon>inventory_2</mat-icon>
+      Products
+    </a>
+    <a mat-button routerLink="/categories" routerLinkActive="active">
+      <mat-icon>category</mat-icon>
+      Categories
+    </a>
+  </nav>
+
+  <!-- Spacer -->
+  <span class="spacer"></span>
+
+  <!-- Desktop Actions -->
+  <div class="nav-actions">
+    <!-- Theme Toggle Button -->
+    <button mat-icon-button (click)="toggleTheme()" matTooltip="Toggle theme">
+      <mat-icon>{{ themeService.isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+
+  </div>
+
+  <!-- Mobile Menu Button -->
+  <button mat-icon-button class="mobile-menu-button" [matMenuTriggerFor]="mobileMenu">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <!-- Mobile Menu -->
+  <mat-menu #mobileMenu="matMenu" class="mobile-menu">
+    <!-- Theme toggle in mobile menu -->
+    <button mat-menu-item (click)="toggleTheme()">
+      <mat-icon>{{ themeService.isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      <span>{{ themeService.isDarkMode() ? 'Light Mode' : 'Dark Mode' }}</span>
+    </button>
+    <mat-divider></mat-divider>
+    <a mat-menu-item routerLink="/">
+      <mat-icon>home</mat-icon>
+      <span>Home</span>
+    </a>
+    <a mat-menu-item routerLink="/products">
+      <mat-icon>inventory_2</mat-icon>
+      <span>Products</span>
+    </a>
+    <a mat-menu-item routerLink="/categories">
+      <mat-icon>category</mat-icon>
+      <span>Categories</span>
+    </a>
+    <mat-divider></mat-divider>
+  </mat-menu>
+</mat-toolbar>
