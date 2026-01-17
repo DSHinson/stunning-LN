@@ -30,7 +30,7 @@ namespace LexisNexis.API.Products
 
                 IEnumerable<Product> data = (result as Result<IEnumerable<Product>>.Success)!.Data;
 
-                return Results.Ok(new ProductPageResponse( page, pageSize,data.Count(), data.Select(x => x.ToDto()).ToList()));
+                return Results.Ok(data.Select(x => x.ToDto()).ToList());
             });
 
             return app;

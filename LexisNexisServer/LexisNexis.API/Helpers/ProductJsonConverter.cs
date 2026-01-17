@@ -15,15 +15,15 @@ namespace LexisNexis.API.Helpers
         {
             writer.WriteStartObject();
 
-            writer.WriteNumber("id", value.Id);
-            writer.WriteString("name", value.Name);
-            writer.WriteNumber("price", value.Price);
-            writer.WriteBoolean("inStock", value.Quantity > 0);
-
-            writer.WriteStartObject("audit");
-            writer.WriteString("createdAt", value.CreatedAt);
-            writer.WriteString("updatedAt", value.UpdatedAt);
-            writer.WriteEndObject();
+            writer.WriteNumber("Id", value.Id);
+            writer.WriteString("Name", value.Name);
+            writer.WriteString("Description", value.Description);
+            writer.WriteString("SKU", value.SKU);
+            writer.WriteString("CategoryId", value.CategoryId.ToString());
+            writer.WriteNumber("Price", value.Price);
+            writer.WriteString("Quantity", value.Quantity.ToString());
+            writer.WriteString("CreatedAt", value.CreatedAt);
+            writer.WriteString("UpdatedAt", value.UpdatedAt);
 
             writer.WriteEndObject();
         }
