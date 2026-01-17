@@ -10,7 +10,7 @@ namespace LexisNexis.Tests.SearchEngine
 {
     public class SearchEngineTests
     {
-        private SearchEngine<Product, int> _searchEngine = null!;
+        private ISearchEngine<Product, int> _searchEngine = null!;
         private IReadRepository<Product, int> _readRepo = null!;
 
         [SetUp]

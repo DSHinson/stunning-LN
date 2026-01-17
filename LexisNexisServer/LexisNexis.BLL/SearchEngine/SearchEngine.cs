@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace LexisNexis.BLL.SearchEngine
 {
-    public sealed class SearchEngine<T, TKey> where T : EntityBase<TKey> , ISearchEngine<T, TKey>
+    public sealed class SearchEngine<T, TKey> : ISearchEngine<T, TKey> where T : EntityBase<TKey>
     {
         private readonly IReadRepository<T, TKey> _repo;
         private readonly List<SearchField> _fields;
@@ -37,38 +37,26 @@ namespace LexisNexis.BLL.SearchEngine
         ///<inheritdoc cref="ISearchEngine{T, TKey}.Search(string)"/>
         public async Task<Result<IEnumerable<T>>> Search(string query)
         {
-            // Build dynamic predicate based on string fields
-            Expression<Func<T, bool>> predicate = BuildPredicate(query);
+            // Query the repository with the
+            Result<IEnumerable<T>> initialResults = await _repo.GetAllAsync();
 
-            // Query the repository with the predicate
-            Result<IEnumerable<T>> candidatesResult = await _repo.GetAllAsync(predicate);
+            if (query is null)
+            {
+                return initialResults;
+            }
 
             // Handle failure
-            if (candidatesResult is Result<IEnumerable<T>>.Failure failure)
+            if (initialResults is Result<IEnumerable<T>>.Failure failure)
             {
                 return ResultHelpers.ToFailure<IEnumerable<T>>(failure.FailureMessage);
             }
 
             // Extract success data
-            Result<IEnumerable<T>>.Success success = (Result<IEnumerable<T>>.Success)candidatesResult;
-            List<T> preFilteredData = success.Data.ToList();
-
-            // If predicate filtered out everything, fallback to all data for fuzzy scoring
-            if (preFilteredData.Count == 0)
-            {
-                candidatesResult = await _repo.GetAllAsync();
-
-                if (candidatesResult is Result<IEnumerable<T>>.Failure failureNoPredicate)
-                {
-                    return ResultHelpers.ToFailure<IEnumerable<T>>(failureNoPredicate.FailureMessage);
-                }
-
-                success = (Result<IEnumerable<T>>.Success)candidatesResult;
-                preFilteredData = success.Data.ToList();
-            }
+            Result<IEnumerable<T>>.Success success = (Result<IEnumerable<T>>.Success)initialResults;
+            List<T> data = success.Data.ToList();
 
             // Apply weighted + fuzzy scoring
-            IEnumerable<T> scoredItems = preFilteredData
+            IEnumerable<T> scoredItems = data
                 .Select(item => new
                 {
                     Item = item,

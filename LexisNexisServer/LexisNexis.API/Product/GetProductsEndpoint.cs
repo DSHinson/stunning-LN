@@ -1,7 +1,9 @@
 ﻿using LexisNexis.BLL.Products;
 using LexisNexis.Common.CQRS;
+using LexisNexis.Common.DTO;
 using LexisNexis.Common.Result;
 using LexisNexis.DAL.Models;
+using LexisNexis.DAL.Mappers;
 
 namespace LexisNexis.API.Products
 {
@@ -28,13 +30,7 @@ namespace LexisNexis.API.Products
 
                 IEnumerable<Product> data = (result as Result<IEnumerable<Product>>.Success)!.Data;
 
-                return Results.Ok(new
-                {
-                    page,
-                    pageSize,
-                    total = data.Count(),
-                    data
-                });
+                return Results.Ok(new ProductPageResponse( page, pageSize,data.Count(), data.Select(x => x.ToDto()).ToList()));
             });
 
             return app;

@@ -2,7 +2,7 @@
 
 namespace LexisNexis.DAL.Models
 {
-   public record Category : EntityBase
+   public record Category : EntityBase<int>
     {
         [SearchWeight(3.0)]
         public string Name { get; set; }

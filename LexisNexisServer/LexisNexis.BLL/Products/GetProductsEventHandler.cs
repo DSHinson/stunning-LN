@@ -13,6 +13,7 @@ namespace LexisNexis.BLL.Products
         private readonly ISearchEngine<Category, int> _categorySearchEngine;
         private readonly ISearchEngine<Product, int> _productSearchEngine;
         private readonly ICacheService _cacheService;
+        private readonly TimeSpan _cacheDuration = TimeSpan.FromSeconds(60);
 
         public GetProductsEventHandler(ICacheService cacheService, ISearchEngine<Category, int> categorySearchEngine, ISearchEngine<Product, int> productSearchEngine)
         {
@@ -109,9 +110,12 @@ namespace LexisNexis.BLL.Products
                     finalProducts = finalProducts.AsQueryable().Where(predicate);
                 }
 
+                //Step 6: Apply pagination
+                finalProducts = finalProducts.Skip((query.Page - 1) * query.PageSize).Take(query.PageSize).ToList();
+
                 // Step 6: Cache the results
                 cacheResult.Data = finalProducts;
-                _cacheService.Set(cacheKey, cacheResult, TimeSpan.FromSeconds(30));
+                _cacheService.Set(cacheKey, cacheResult, _cacheDuration);
 
                 return ResultHelpers.ToResult(finalProducts);
             }

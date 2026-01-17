@@ -2,7 +2,7 @@
 
 namespace LexisNexis.DAL.Models
 {
-    public record Product : EntityBase , IComparable<Product>
+    public record Product : EntityBase<int> , IComparable<Product>
     {
 
         [SearchWeight(3.0)]
