@@ -9,18 +9,21 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="coverlet.collector"/>
+    <PackageReference Include="coverlet.collector" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="NUnit"/>
-    <PackageReference Include="NUnit.Analyzers"/>
-    <PackageReference Include="NUnit3TestAdapter"/>
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit.Analyzers" />
+    <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     <PackageReference Include="System.IO.Hashing" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LexisNexis.API\LexisNexis.API.csproj" />
+    <ProjectReference Include="..\LexisNexis.BLL\LexisNexis.BLL.csproj" />
     <ProjectReference Include="..\LexisNexis.Common\LexisNexis.Common.csproj" />
+    <ProjectReference Include="..\LexisNexis.DAL\LexisNexis.DAL.csproj" />
   </ItemGroup>
 
   <ItemGroup>

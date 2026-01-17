@@ -12,8 +12,7 @@ namespace LexisNexis.DAL.Seed
         public static List<Product> SeedProducts(List<Category> categories)
         {
             // Helper to get a category id by name
-            int GetCategoryId(string name) =>
-                categories.First(c => c.Name == name).Id;
+            int GetCategoryId(string name) => categories.First(c => c.Name == name).Id;
 
             return new List<Product>
             {

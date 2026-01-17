@@ -1,6 +1,7 @@
 using LexisNexis.API.Helpers;
 using LexisNexis.API.Middleware;
 using LexisNexis.API.Products;
+using LexisNexis.BLL.SearchEngine;
 using LexisNexis.Common.Cache;
 using LexisNexis.Common.CQRS;
 using LexisNexis.DAL;
@@ -28,6 +29,9 @@ namespace LexisNexis.API
 
             builder.Services.AddSingleton<ICacheService, CacheService>();
             builder.Services.AddCqrs(typeof(LexisNexis.BLL.AssemblyMarkerForBll).Assembly);
+
+            builder.Services.AddScoped(typeof(ISearchEngine<,>), typeof(SearchEngine<,>));
+
 
             bool useEF = true;
             if (useEF)

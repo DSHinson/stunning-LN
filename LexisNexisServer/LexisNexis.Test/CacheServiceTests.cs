@@ -1,6 +1,4 @@
-using System;
 using Microsoft.Extensions.Caching.Memory;
-using NUnit.Framework;
 using LexisNexis.Common.Cache;
 
 namespace LexisNexis.Tests.Cache
