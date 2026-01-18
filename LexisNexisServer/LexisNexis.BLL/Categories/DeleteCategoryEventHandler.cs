@@ -31,11 +31,11 @@ namespace LexisNexis.BLL.Categories
             var parentResult = await _readRepo.FindAsync(c => c.ParentCategoryId == command.Id);
             if (parentResult is Result<IEnumerable<Category>>.Success children && children.Data.Any())
             {
-                return ResultHelpers.ToFailure<Result>("Can not delete a parent category");
+                return ResultHelpers.ToFailure("Can not delete a parent category");
             }
             else if (parentResult is Result<IEnumerable<Category>>.Failure)
             {
-                return ResultHelpers.ToFailure<Result>("Can not delete, unable to check if a parent category");
+                return ResultHelpers.ToFailure("Can not delete, unable to check if a parent category");
             }
 
             return await _writeRepo.RemoveAsync(command.Id);

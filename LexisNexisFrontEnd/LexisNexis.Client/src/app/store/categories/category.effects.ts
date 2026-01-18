@@ -122,7 +122,7 @@ export class CategoryEffects {
   reloadAfterDelete$ = createEffect(() =>
     this.actions$.pipe(
       ofType(
-        CategoryActions.deleteCategory,
+        CategoryActions.deleteCategorySuccess,
       ),
       concatMap(() => [
         CategoryActions.loadCategoryTree(),
