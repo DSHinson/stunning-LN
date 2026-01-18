@@ -121,9 +121,7 @@ export class CategoryEffects {
     /**Reload after save success */
   reloadAfterDelete$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(
-        CategoryActions.deleteCategorySuccess,
-      ),
+      ofType(CategoryActions.deleteCategorySuccess),
       concatMap(() => [
         CategoryActions.loadCategoryTree(),
         CategoryActions.loadCategories()
@@ -133,4 +131,17 @@ export class CategoryEffects {
       })
     )
   );
+
+    deleteCategoryFailureToast$ = createEffect(
+      () =>
+        this.actions$.pipe(
+          ofType(CategoryActions.deleteCategoryFailure),
+          tap(({ error }) => {
+            this.toastService.error(
+              error?.error?.message ?? error?.message ?? 'Failed to create product'
+            );
+          })
+        ),
+      { dispatch: false }
+    );
 }

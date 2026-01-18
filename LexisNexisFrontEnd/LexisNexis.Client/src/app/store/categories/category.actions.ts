@@ -46,15 +46,15 @@ export const createCategoryFailure = createAction(
 );
 
 export const deleteCategory = createAction(
-  '[Category] Save Category',
+  '[Category] Delete Category',
   props<{ id: number }>()
 );
 
 export const deleteCategorySuccess = createAction(
-  '[Category] Save Category Success'
+  '[Category] Delete Category Success'
 );
 
 export const deleteCategoryFailure = createAction(
-  '[Category] Save Category Failure',
+  '[Category] Delete Category Failure',
   props<{ error: any }>()
 );

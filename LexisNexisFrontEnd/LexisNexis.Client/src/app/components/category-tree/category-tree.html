@@ -1,9 +1,7 @@
 <div style="display: flex; flex-direction: column;">
   <ng-container *ngFor="let category of categories">
     <!-- Category row -->
-    <div style="display: flex; align-items: center; gap: 8px;"
-      [ngStyle]="{ 'font-weight': category.id === selectedCategoryId ? 'bold' : 'normal' }"
-    >
+    <div style="display: flex; align-items: center; gap: 8px;">
       {{ category.name }}
 
       <!-- Delete icon only for leaf nodes -->
@@ -27,10 +25,7 @@
     <!-- Recursive children with doubled indent -->
     <div *ngIf="category.children?.length" style="padding-left: 40px; border-left: 1px dashed #ccc; margin-left: 5px;">
       <app-category-tree
-        [categories]="category.children ?? []"
-        [selectedCategoryId]="selectedCategoryId"
-        (categorySelected)="categorySelected.emit($event)"
-        (categoryDeleted)="categoryDeleted.emit($event)">
+        [categories]="category.children ?? []">
       </app-category-tree>
     </div>
   </ng-container>

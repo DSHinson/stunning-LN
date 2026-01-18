@@ -4,6 +4,10 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CategoryTreeDto } from '../../models/category-tree.dto';
+import { CategoryDto } from '../../models/category.dto';
+import * as CategoryActions from '../../store/categories/category.actions';
+import { Store } from '@ngrx/store';
+import { CategoryState } from '../../store/categories/category.state';
 
 @Component({
   selector: 'app-category-tree',
@@ -19,16 +23,14 @@ import { CategoryTreeDto } from '../../models/category-tree.dto';
 })
 export class CategoryTree {
   @Input() categories: CategoryTreeDto[] = [];
-  @Input() selectedCategoryId: number | null = null;
-  @Output() categorySelected = new EventEmitter<number>();
-  @Output() categoryDeleted = new EventEmitter<number>();
+  constructor(private store: Store<CategoryState>)
+  {}
 
-  selectCategory(category: CategoryTreeDto) {
-    this.categorySelected.emit(category.id);
+ deleteCategory(category: CategoryTreeDto) {
+        // Optional: confirm deletion
+        const confirmed = confirm(`Are you sure you want to delete "${category.name}"?`);
+        if (!confirmed) return;
+
+        this.store.dispatch(CategoryActions.deleteCategory({ id: category.id }));
   }
-  deleteCategory(category: any) {
-  if (confirm(`Are you sure you want to delete "${category.name}"?`)) {
-    this.categoryDeleted.emit(category);
-  }
-}
 }

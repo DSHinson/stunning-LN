@@ -45,15 +45,11 @@ export class CategoryFlat {
     return category ? category.name : '';
   }
 
-  editCategory(_t55: any) {
-    throw new Error('Method not implemented.');
-  }
   deleteCategory(category: CategoryDto) {
         // Optional: confirm deletion
         const confirmed = confirm(`Are you sure you want to delete "${category.name}"?`);
         if (!confirmed) return;
 
         this.store.dispatch(CategoryActions.deleteCategory({ id: category.id }));
-
   }
 }
