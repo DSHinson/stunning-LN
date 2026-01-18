@@ -1,11 +1,14 @@
-// ============================================================================
-// IMPORT MATERIAL PREBUILT THEME (replace the @use line)
-// ============================================================================
-@import '@angular/material/prebuilt-themes/indigo-pink.css';
 
-// ============================================================================
-// GLOBAL RESETS
-// ============================================================================
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+.dark-theme {
+  @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+}
+.light-theme {
+  @import '@angular/material/prebuilt-themes/indigo-pink.css';
+}
+
 
 * {
   margin: 0;

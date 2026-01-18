@@ -34,6 +34,6 @@ export class CategoryFilter {
   /** Emit the selected category ID */
   onCategorySelected(categoryId: number | null) {
     this.selectedCategoryId = categoryId;
-    this.categorySelected.emit(categoryId); // <-- emits to parent
+    this.categorySelected.emit(categoryId);
   }
 }
