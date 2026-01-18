@@ -1,5 +1,13 @@
 # Angular Project Setup Instructions
 
+## Navigate to Angular Project
+
+Navigate to the Angular project directory:
+
+```bash
+cd LexisNexis\LexisNexisFrontEnd\LexisNexis.Client
+```
+
 ## 1. Node + NPM Setup
 
 Install and use Node.js version 24.3.0:
@@ -61,6 +69,16 @@ ng serve
 ---
 
 ## Running the .NET API
+
+### Prerequisites
+
+Ensure you have **.NET 8 SDK** installed. All projects in this solution target .NET 8.
+
+You can verify your installation by running:
+
+```bash
+dotnet --version
+```
 
 ### Open the Solution in Visual Studio
 
