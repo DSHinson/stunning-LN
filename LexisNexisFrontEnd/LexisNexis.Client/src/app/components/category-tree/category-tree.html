@@ -1,0 +1,37 @@
+<div style="display: flex; flex-direction: column;">
+  <ng-container *ngFor="let category of categories">
+    <!-- Category row -->
+    <div style="display: flex; align-items: center; gap: 8px;"
+      [ngStyle]="{ 'font-weight': category.id === selectedCategoryId ? 'bold' : 'normal' }"
+    >
+      {{ category.name }}
+
+      <!-- Delete icon only for leaf nodes -->
+      <button
+        mat-icon-button
+        color="warn"
+        *ngIf="!category.children || category.children.length === 0"
+        (click)="deleteCategory(category)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+
+    <!-- Description (no margin) -->
+    <div style="font-style: italic; color: gray;">
+      {{ category.description }}
+    </div>
+
+    <!-- Horizontal rule if there are children -->
+    <hr *ngIf="category.children?.length" style="margin: 8px 0; border-top: 1px dashed #ccc;" />
+
+    <!-- Recursive children with doubled indent -->
+    <div *ngIf="category.children?.length" style="padding-left: 40px; border-left: 1px dashed #ccc; margin-left: 5px;">
+      <app-category-tree
+        [categories]="category.children ?? []"
+        [selectedCategoryId]="selectedCategoryId"
+        (categorySelected)="categorySelected.emit($event)"
+        (categoryDeleted)="categoryDeleted.emit($event)">
+      </app-category-tree>
+    </div>
+  </ng-container>
+</div>

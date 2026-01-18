@@ -13,8 +13,21 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CategoryService implements ICategoryService {
+
   private readonly http = inject(HttpService);
   private readonly baseEndpoint = 'categories';
+
+  createCategory(category: CategoryDto): Observable<CategoryDto> {
+    return this.http.post<CategoryDto>(this.baseEndpoint, category);
+  }
+
+  updateCategory(id: number, category: Partial<CategoryDto>): Observable<CategoryDto> {
+    return this.http.put<CategoryDto>(`${this.baseEndpoint}/${id}`, category);
+  }
+
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseEndpoint}/${id}`);
+  }
 
   /**
    * Get all categories as a flat list

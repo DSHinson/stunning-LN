@@ -24,11 +24,6 @@ export class ProductEffects {
   private readonly toastService = inject(ToastService);
   private readonly store = inject(Store);
 
-  /**
-   * Effect that listens for the loadProducts action.
-   * When dispatched, it calls the productService to fetch products,
-   * then emits either a success or failure action.
-   */
   loadProducts$ = createEffect(() =>
     this.actions$.pipe(
       // Listen only for loadProducts actions
@@ -88,21 +83,25 @@ export class ProductEffects {
   );
 
   reloadAfterChange$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(
-      ProductActions.createProductSuccess,
-      ProductActions.updateProductSuccess
-    ),
-    concatMap(() =>
-      this.store.select(selectPagination).pipe(
-        take(1),
-        map(({ page, pageSize }) =>
-          ProductActions.loadProducts({ page, pageSize })
+    this.actions$.pipe(
+      ofType(
+        ProductActions.createProductSuccess,
+        ProductActions.updateProductSuccess
+      ),
+      concatMap(() =>
+        this.store.select(selectPagination).pipe(
+          take(1),
+          concatMap(({ pageSize }) => [
+            ProductActions.setPage({ page: 1 }),
+            ProductActions.loadProducts({ page: 1, pageSize }),
+          ]),
+          tap(() => {
+            this.toastService.success('Saved product successfully', 'Success');
+          })
         )
       )
     )
-  )
-);
+  );
 
   createProductFailureToast$ = createEffect(
     () =>

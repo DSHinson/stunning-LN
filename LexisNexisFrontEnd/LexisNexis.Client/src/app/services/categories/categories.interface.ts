@@ -27,4 +27,13 @@ export interface ICategoryService {
    * @returns Observable emitting an array of CategoryDto representing the root categories with nested children
    */
   getCategoryTree(): Observable<CategoryTreeDto[]>;
+
+  /** Create a new category */
+  createCategory(category: CategoryDto): Observable<CategoryDto>;
+
+  /** Update an existing category */
+  updateCategory(id: number, category: CategoryDto): Observable<CategoryDto>;
+
+  /** Delete a category by its ID */
+  deleteCategory(id: number): Observable<void>;
 }

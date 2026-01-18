@@ -1,0 +1,17 @@
+<div class="search-bar">
+  <!-- Search input -->
+  <mat-form-field appearance="outline" class="search-input">
+    <mat-label>Search products</mat-label>
+    <input matInput [(ngModel)]="searchTerm" placeholder="Enter product name" />
+  </mat-form-field>
+
+  <!-- Buttons group -->
+  <div class="search-buttons">
+    <button mat-raised-button color="primary" (click)="onSearch()">
+      Search
+    </button>
+    <button mat-stroked-button color="warn" (click)="clearSearch()">
+      Clear
+    </button>
+  </div>
+</div>

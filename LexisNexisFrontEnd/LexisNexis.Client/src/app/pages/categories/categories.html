@@ -1,6 +1,19 @@
-<p>categories works!</p>
-    <mat-list>
-      <mat-list-item *ngFor="let category of categories$ | async">
-        {{ category.name }}
-      </mat-list-item>
-    </mat-list>
+ <button
+    mat-fab
+    color="primary"
+    aria-label="Create product"
+    (click)="openCreate()"
+  >
+  <mat-icon>add</mat-icon>
+  </button>
+
+<mat-tab-group>
+  <mat-tab label="Flat View">
+    <app-category-flat></app-category-flat>
+  </mat-tab>
+  <mat-tab label="Tree View">
+    <app-category-tree
+      [categories]="(categoriesTree$ | async) || []"
+    ></app-category-tree>
+  </mat-tab>
+</mat-tab-group>

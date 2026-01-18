@@ -4,9 +4,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { selectAllCategories } from '../../store/categories/category.selectors';
-import { selectAllProducts, selectProductsLoading } from '../../store/products/product.selectors';
+import { selectAllProducts, selectPagination, selectProductsLoading } from '../../store/products/product.selectors';
 import { CategoryDto } from '../../models/category.dto';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { ProductDto } from '../../models/product.dto';
 import { Store } from '@ngrx/store';
 import { ProductState } from '../../store/products/product.state';
@@ -51,15 +51,19 @@ export class ProductsList {
   categories: CategoryDto[] = [];
   products$: Observable<ProductDto[]>;
   loading$: Observable<boolean>;
+  pageFromState$: Observable<number>;
 
   constructor(private store: Store<ProductState>, private dialog: MatDialog) {
     this.products$ = this.store.select(selectAllProducts);
     this.loading$ = this.store.select(selectProductsLoading);
     this.categories$ = this.store.select(selectAllCategories);
+    this.pageFromState$ = this.store.select(selectPagination).pipe(map(p => p.page));
 
     this.store.dispatch(ProductActions.loadProducts({ page: this.currentPage, pageSize: this.pageSize }));
     this.store.dispatch(CategoryActions.loadCategories());
     this.categories$.subscribe(cats => this.categories = cats);
+    this.pageFromState$.subscribe(page => this.currentPage = page);
+    this.store.dispatch(ProductActions.setPage({ page: 1 }));
 
   }
 

@@ -42,12 +42,12 @@ export class ProductForm {
     this.product = data;
 
     this.form = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(100)]],
-      description: ['', [Validators.required, Validators.maxLength(250)]],
-      sku: ['', [Validators.required, Validators.maxLength(50)]],
+      name: ['', [Validators.required,Validators.minLength(3), Validators.maxLength(100)]],
+      description: ['', [Validators.required,Validators.minLength(3), Validators.maxLength(250)]],
+      sku: ['', [Validators.required,Validators.minLength(3), Validators.maxLength(50)]],
       categoryId: [null, Validators.required],
-      price: [0, [Validators.required, Validators.min(0)]],
-      quantity: [0, [Validators.required, Validators.min(0)]]
+      price: [0, [Validators.required, Validators.min(1)]],
+      quantity: [0, [Validators.required, Validators.min(1)]]
     });
 
     if (this.product) {

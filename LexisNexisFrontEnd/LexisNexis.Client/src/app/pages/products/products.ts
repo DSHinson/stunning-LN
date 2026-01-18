@@ -1,11 +1,10 @@
 import { CategoryFilter } from "../../components/category-filter/category-filter";
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ProductState } from '../../store/products/product.state';
 import * as ProductActions from '../../store/products/product.actions';
 
 import { Observable } from 'rxjs';
-import { ProductDto } from '../../models/product.dto';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,11 +19,9 @@ import { CategoryDto } from "../../models/category.dto";
 import { selectAllCategories } from "../../store/categories/category.selectors";
 
 import { ProductsList } from "../../components/products-list/products-list";
-/**
- * Standalone component for displaying products.
- * It injects the NgRx store to read the product state
- * and dispatch actions if needed.
- */
+import { SearchBar } from "../../components/search-bar/search-bar";
+
+
 @Component({
   selector: 'app-products',
   standalone: true,
@@ -36,7 +33,7 @@ import { ProductsList } from "../../components/products-list/products-list";
     MatListModule,
     CategoryFilter,
     MatIconModule,
-     ProductsList],
+    ProductsList, SearchBar],
   templateUrl: './products.html',
   styleUrls: ['./products.css']
 })
@@ -46,7 +43,7 @@ export class Products {
   selectedCategoryId: number | null = null;
   categories$: Observable<CategoryDto[]>;
   categories: CategoryDto[] = [];
-
+  @ViewChild('categoryFilter') categoryFilter!: CategoryFilter;
 
   constructor(private store: Store<ProductState>, private dialog: MatDialog) {
     this.categories$ = this.store.select(selectAllCategories);
@@ -55,9 +52,8 @@ export class Products {
 
   onCategoryFilterChanged(categoryId: number | null) {
     this.selectedCategoryId = categoryId;
-    this.store.dispatch(
-      ProductActions.loadProducts({ search: this.searchTerm, category: this.selectedCategoryId ?? undefined })
-    );
+    this.store.dispatch(ProductActions.setPage({ page: 1 }));
+    this.store.dispatch(ProductActions.loadProducts({ search: this.searchTerm, category: this.selectedCategoryId ?? undefined }));
   }
 
   getCategoryName(id: number | undefined): string {
@@ -66,25 +62,13 @@ export class Products {
     return category ? category.name : '';
   }
 
-
-  clearSearch() {
-    this.searchTerm = '';
-    this.selectedCategoryId = null
-    this.onSearch();
-  }
-
-  onSearch() {
-    this.store.dispatch(
-      ProductActions.loadProducts({ search: this.searchTerm, category: this.selectedCategoryId ?? undefined })
-    );
-  }
-
   openCreate(): void {
     this.dialog.open(ProductForm, {
       width: '600px'
     }).afterClosed().subscribe(result => {
       if (result) {
         // create product
+        this.store.dispatch(ProductActions.setPage({ page: 1 }));
         this.store.dispatch(ProductActions.createProduct({ product: result }));
       }
     });

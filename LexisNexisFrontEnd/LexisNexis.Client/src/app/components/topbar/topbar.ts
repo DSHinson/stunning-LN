@@ -25,24 +25,9 @@ import { IThemeService } from '../../services/theme/theme.interface';
   standalone: true
 })
 export class Topbar {
- cartItemCount = 3; // Example cart count
-  isLoggedIn = false; // Example login state
 public themeService: IThemeService = inject(THEME_SERVICE);
 
   toggleTheme() {
     this.themeService.toggleTheme();
-  }
-
-  onLogin() {
-    console.log('Login clicked');
-  }
-
-  onSignup() {
-    console.log('Signup clicked');
-  }
-
-  onLogout() {
-    console.log('Logout clicked');
-    this.isLoggedIn = false;
   }
 }

@@ -11,19 +11,14 @@ import * as CategoryActions from '../../store/categories/category.actions';
 
 @Component({
   selector: 'app-category-filter',
- imports: [CommonModule, MatFormFieldModule, MatSelectModule],
+  imports: [CommonModule, MatFormFieldModule, MatSelectModule],
   templateUrl: './category-filter.html',
   styleUrl: './category-filter.scss',
   standalone: true,
 })
 export class CategoryFilter {
-  /** Observable of all categories */
   categories$: Observable<CategoryDto[]>;
-
-  /** Current selection */
   selectedCategoryId: number | null = null;
-
-  /** Emit selected category ID to parent */
   @Output() categorySelected = new EventEmitter<number | null>();
 
   constructor(private store: Store<CategoryState>) {
@@ -31,9 +26,13 @@ export class CategoryFilter {
     this.store.dispatch(CategoryActions.loadCategories());
   }
 
-  /** Emit the selected category ID */
   onCategorySelected(categoryId: number | null) {
     this.selectedCategoryId = categoryId;
     this.categorySelected.emit(categoryId);
+  }
+
+  clearSelection() {
+    this.selectedCategoryId = null;
+    this.categorySelected.emit(null);
   }
 }

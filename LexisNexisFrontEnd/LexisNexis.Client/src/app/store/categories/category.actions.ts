@@ -2,9 +2,7 @@ import { createAction, props } from '@ngrx/store';
 import { CategoryDto } from '../../models/category.dto';
 import { CategoryTreeDto } from '../../models/category-tree.dto';
 
-/**
- * Actions for loading the flat list of categories
- */
+
 export const loadCategories = createAction(
   '[Category] Load Categories'
 );
@@ -19,9 +17,6 @@ export const loadCategoriesFailure = createAction(
   props<{ error: string }>()
 );
 
-/**
- * Actions for loading the tree structure of categories
- */
 export const loadCategoryTree = createAction(
   '[Category] Load Category Tree'
 );
@@ -34,4 +29,32 @@ export const loadCategoryTreeSuccess = createAction(
 export const loadCategoryTreeFailure = createAction(
   '[Category] Load Category Tree Failure',
   props<{ error: string }>()
+);
+
+export const createCategory = createAction(
+  '[Category] Save Category',
+  props<{ category: CategoryDto }>()
+);
+
+export const createCategorySuccess = createAction(
+  '[Category] Save Category Success'
+);
+
+export const createCategoryFailure = createAction(
+  '[Category] Save Category Failure',
+  props<{ error: any }>()
+);
+
+export const deleteCategory = createAction(
+  '[Category] Save Category',
+  props<{ id: number }>()
+);
+
+export const deleteCategorySuccess = createAction(
+  '[Category] Save Category Success'
+);
+
+export const deleteCategoryFailure = createAction(
+  '[Category] Save Category Failure',
+  props<{ error: any }>()
 );

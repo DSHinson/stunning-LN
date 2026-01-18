@@ -27,15 +27,6 @@
   <!-- Spacer -->
   <span class="spacer"></span>
 
-  <!-- Desktop Actions -->
-  <div class="nav-actions">
-    <!-- Theme Toggle Button -->
-    <button mat-icon-button (click)="toggleTheme()" matTooltip="Toggle theme">
-      <mat-icon>{{ themeService.isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
-    </button>
-
-  </div>
-
   <!-- Mobile Menu Button -->
   <button mat-icon-button class="mobile-menu-button" [matMenuTriggerFor]="mobileMenu">
     <mat-icon>menu</mat-icon>
@@ -43,11 +34,7 @@
 
   <!-- Mobile Menu -->
   <mat-menu #mobileMenu="matMenu" class="mobile-menu">
-    <!-- Theme toggle in mobile menu -->
-    <button mat-menu-item (click)="toggleTheme()">
-      <mat-icon>{{ themeService.isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
-      <span>{{ themeService.isDarkMode() ? 'Light Mode' : 'Dark Mode' }}</span>
-    </button>
+
     <mat-divider></mat-divider>
     <a mat-menu-item routerLink="/">
       <mat-icon>home</mat-icon>

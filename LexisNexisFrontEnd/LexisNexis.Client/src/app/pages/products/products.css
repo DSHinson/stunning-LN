@@ -1,0 +1,16 @@
+.search-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: stretch;
+
+
+  .category-filter {
+    flex: 0 0 auto;
+  }
+
+  button[mat-fab] {
+    height: 56px;
+    width: 56px;
+  }
+}

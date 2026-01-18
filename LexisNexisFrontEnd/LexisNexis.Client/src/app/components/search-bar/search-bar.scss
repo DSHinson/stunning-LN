@@ -1,0 +1,30 @@
+.search-bar {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.search-input {
+  flex: 1 1 auto;        // allow to grow
+  min-width: 0;          // required so flex shrinking works
+
+  // force mat-form-field wrapper to fill
+  .mat-form-field-wrapper {
+    width: 100%;
+  }
+
+  .mat-form-field-flex {
+    width: 100%;
+  }
+}
+
+.search-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.search-buttons button {
+  height: 56px;          // same as input height
+  min-width: 100px;      // optional
+}

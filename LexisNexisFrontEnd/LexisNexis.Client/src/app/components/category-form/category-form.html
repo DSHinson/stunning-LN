@@ -1,0 +1,48 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="category-form">
+  <mat-card>
+    <mat-card-title>
+      {{ category ? "Edit Category" : "Create Category" }}
+    </mat-card-title>
+
+    <mat-card-content>
+      <!-- Name -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" />
+        <mat-error *ngIf="form.get('name')?.hasError('required')">
+          Name is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Description -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput rows="3" formControlName="description"></textarea>
+        <mat-error *ngIf="form.get('description')?.hasError('required')">
+          Description is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Parent Category -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Parent Category</mat-label>
+        <mat-select formControlName="parentCategoryId">
+          <mat-option [value]="null">No Parent</mat-option>
+          <mat-option
+            *ngFor="let cat of categories$ | async"
+            [value]="cat.id"
+          >
+            {{ cat.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-button type="button" (click)="cancel()">Cancel</button>
+      <button mat-raised-button color="primary" type="submit">
+        {{ category ? "Update" : "Create" }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</form>
