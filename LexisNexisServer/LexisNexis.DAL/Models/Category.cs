@@ -11,5 +11,7 @@ namespace LexisNexis.DAL.Models
         public string Description { get; set; }
 
         public int? ParentCategoryId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }

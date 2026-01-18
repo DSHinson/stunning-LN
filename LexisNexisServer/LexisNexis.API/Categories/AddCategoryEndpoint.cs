@@ -20,7 +20,7 @@ namespace LexisNexis.API.Categories
                 {
                         Name = CategoryData.Name,
                         Description = CategoryData.Description,
-                        ParentCategoryId = CategoryData.ParentId
+                        ParentCategoryId = CategoryData.ParentCategoryId
                 });
 
                 return result.ToApiResponse();

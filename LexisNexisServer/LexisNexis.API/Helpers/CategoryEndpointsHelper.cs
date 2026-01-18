@@ -9,6 +9,7 @@ namespace LexisNexis.API.Helpers
             app.MapGetCategories();
             app.MapPostCategories();
             app.MapGetCategoriesTree();
+            app.MapDeleteProduct();
 
             return app;
         }
