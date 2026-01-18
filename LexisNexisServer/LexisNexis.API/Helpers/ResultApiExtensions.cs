@@ -10,7 +10,7 @@ namespace LexisNexis.API.Helpers
             return result switch
             {
                 Result<T>.Success success => Results.Ok(success.Data),
-                Result<T>.Failure failure => Results.NotFound(new { message = failure.FailureMessage }),
+                Result<T>.Failure failure => Results.BadRequest(new { message = failure.FailureMessage }),
                 _ => Results.Problem("Unknown error")
             };
         }
@@ -21,7 +21,7 @@ namespace LexisNexis.API.Helpers
             return result switch
             {
                 Result.Success success => Results.Ok(SuccessMessage),
-                Result.Failure failure => Results.NotFound(new { message = failure.FailureMessage }),
+                Result.Failure failure => Results.BadRequest(new { message = failure.FailureMessage }),
                 _ => Results.Problem("Unknown error")
             };
         }

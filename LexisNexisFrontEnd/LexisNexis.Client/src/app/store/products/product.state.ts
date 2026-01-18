@@ -7,6 +7,8 @@ import { ProductDto } from '../../models/product.dto';
 export interface ProductState {
   products: ProductDto[];
   loading: boolean;
+  currentPage: number;
+  pageSize: number;
   error?: string;
 }
 
@@ -16,5 +18,7 @@ export interface ProductState {
  */
 export const initialProductState: ProductState = {
   products: [],
-  loading: false
+  loading: false,
+  currentPage: 1,
+  pageSize: 10
 };

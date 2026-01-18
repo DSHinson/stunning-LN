@@ -22,7 +22,7 @@ namespace LexisNexis.BLL.Products
         {
             if (command is not { Name: { Length: > 2 }, SKU: { Length: > 0 }, Price: > 0, Quantity: >= 0 })
             {
-                return ResultHelpers.ToFailure<Product>("Invalid product data.");
+                return ResultHelpers.ToFailure<Product>( "Invalid product data. Ensure Name is at least 3 characters, SKU is provided, Price > 0, and Quantity >= 0." );
             }
 
             var result = await _repo.AddAsync(new Product

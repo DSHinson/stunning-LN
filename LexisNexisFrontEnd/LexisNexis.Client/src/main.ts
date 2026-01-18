@@ -8,6 +8,8 @@ import { ProductEffects } from './app/store/products/product.effects';
 import { categoryReducer } from './app/store/categories/category.reducer';
 import { CategoryEffects } from './app/store/categories/category.effects';
 import { provideHttpClient } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideToastr } from 'ngx-toastr';
 
 bootstrapApplication(App, {
   ...appConfig,
@@ -16,9 +18,15 @@ bootstrapApplication(App, {
     provideHttpClient(),
     provideStore({
       products: productReducer,
-      categories: categoryReducer, // <-- add the categories slice here
+      categories: categoryReducer,
     }),
-    provideEffects(ProductEffects, CategoryEffects) // <-- add category effects
+    provideEffects(ProductEffects, CategoryEffects),
+    provideAnimations(),
+        provideToastr({
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+      timeOut: 4000
+    })
   ]
 })
 .catch((err) => console.error(err));

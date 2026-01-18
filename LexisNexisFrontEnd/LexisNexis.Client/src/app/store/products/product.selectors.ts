@@ -31,3 +31,8 @@ export const selectProductsError = createSelector(
   selectProductState,
   state => state.error
 );
+
+export const selectPagination = createSelector(
+  selectProductState,
+  state => state.currentPage && state.pageSize ? { page: state.currentPage, pageSize: state.pageSize } : { page: 1, pageSize: 10 }
+);

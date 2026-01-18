@@ -77,3 +77,13 @@ export const createProductFailure = createAction(
   '[Product] Create Product Failure',
   props<{ error: any }>()
 );
+
+export const setPage = createAction(
+  '[Product] Set Page',
+  props<{ page: number }>()
+);
+
+export const setPageSize = createAction(
+  '[Product] Set Page Size',
+  props<{ pageSize: number }>()
+);

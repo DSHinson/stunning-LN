@@ -30,5 +30,26 @@ export const productReducer = createReducer(
     ...state,
     loading: false,
     error
+  })),
+
+  on(ProductActions.deleteProductSuccess, (state, { productId }) => ({
+    ...state,
+    products: state.products.filter(p => p.id !== productId)
+  })),
+
+  on(ProductActions.createProductFailure, (state, { error }) => ({
+    ...state,
+    error
+  })),
+
+    on(ProductActions.setPage, (state, { page }) => ({
+    ...state,
+    currentPage: page
+  })),
+
+  on(ProductActions.setPageSize, (state, { pageSize }) => ({
+    ...state,
+    pageSize
   }))
+
 );

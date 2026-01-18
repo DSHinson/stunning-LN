@@ -66,6 +66,7 @@ export class ProductsList {
   goToPreviousPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
+      this.store.dispatch(ProductActions.setPage({ page: this.currentPage }));
       this.store.dispatch(ProductActions.loadProducts({ page: this.currentPage, pageSize: this.pageSize }));
     }
   }
@@ -73,6 +74,7 @@ export class ProductsList {
   goToNextPage() {
 
     this.currentPage++;
+    this.store.dispatch(ProductActions.setPage({ page: this.currentPage }));
     this.store.dispatch(ProductActions.loadProducts({ page: this.currentPage, pageSize: this.pageSize }));
 
   }
@@ -101,6 +103,6 @@ export class ProductsList {
     const confirmed = confirm(`Are you sure you want to delete "${product.name}"?`);
     if (!confirmed) return;
 
-    this.store.dispatch(ProductActions.deleteProduct({ product: product }))
+    this.store.dispatch(ProductActions.deleteProduct({ product: product }));
   }
 }

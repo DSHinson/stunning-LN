@@ -1,11 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, map, switchMap, of, mergeMap } from 'rxjs';
+import { catchError, map, switchMap, of, mergeMap, tap, concatMap, take } from 'rxjs';
 import * as ProductActions from './product.actions';
 import { PRODUCT_SERVICE } from '../../services/products/product.token';
 import { IProductService } from '../../services/products/product.interface';
 import { createProductFailure, createProductSuccess, deleteProduct, deleteProductFailure, deleteProductSuccess, updateProduct, updateProductFailure, updateProductSuccess } from './product.actions';
 import { ProductDto } from '../../models/product.dto';
+import { ToastService } from '../../services/toasts/toasts.service';
+import { selectPagination } from './product.selectors';
+import { Store } from '@ngrx/store';
 
 /**
  * ProductEffects handles side effects for the product store.
@@ -18,6 +21,8 @@ export class ProductEffects {
 
   private readonly actions$ = inject(Actions);
   private readonly productService = inject<IProductService>(PRODUCT_SERVICE);
+  private readonly toastService = inject(ToastService);
+  private readonly store = inject(Store);
 
   /**
    * Effect that listens for the loadProducts action.
@@ -30,7 +35,7 @@ export class ProductEffects {
       ofType(ProductActions.loadProducts),
 
       // switchMap cancels previous requests if a new action comes in
-      switchMap(({page = 1, pageSize = 10, category, search }) =>
+      switchMap(({ page = 1, pageSize = 10, category, search }) =>
         this.productService.getProducts(page, pageSize, search, category).pipe(
           // On success, dispatch loadProductsSuccess with the returned products
           map(products => ProductActions.loadProductsSuccess({ products })),
@@ -50,7 +55,7 @@ export class ProductEffects {
     this.actions$.pipe(
       ofType(updateProduct),
       mergeMap(({ product }) =>
-        this.productService.updateProduct(product.categoryId, product).pipe(
+        this.productService.updateProduct(product.id, product).pipe(
           map((updatedProduct: ProductDto) => updateProductSuccess({ product: updatedProduct })),
           catchError((error) => of(updateProductFailure({ error })))
         )
@@ -58,7 +63,7 @@ export class ProductEffects {
     )
   );
 
-    deleteProduct$ = createEffect(() =>
+  deleteProduct$ = createEffect(() =>
     this.actions$.pipe(
       ofType(deleteProduct),
       mergeMap(({ product }) =>
@@ -70,7 +75,7 @@ export class ProductEffects {
     )
   );
 
-    createProduct$ = createEffect(() =>
+  createProduct$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ProductActions.createProduct),
       mergeMap(({ product }) =>
@@ -80,5 +85,35 @@ export class ProductEffects {
         )
       )
     )
+  );
+
+  reloadAfterChange$ = createEffect(() =>
+  this.actions$.pipe(
+    ofType(
+      ProductActions.createProductSuccess,
+      ProductActions.updateProductSuccess
+    ),
+    concatMap(() =>
+      this.store.select(selectPagination).pipe(
+        take(1),
+        map(({ page, pageSize }) =>
+          ProductActions.loadProducts({ page, pageSize })
+        )
+      )
+    )
+  )
+);
+
+  createProductFailureToast$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(ProductActions.createProductFailure),
+        tap(({ error }) => {
+          this.toastService.error(
+            error?.error?.message ?? error?.message ?? 'Failed to create product'
+          );
+        })
+      ),
+    { dispatch: false }
   );
 }
