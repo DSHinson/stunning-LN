@@ -44,5 +44,14 @@ namespace LexisNexis.Common.Cache
         /// uniqueness of the resulting GUID. Cannot contain null elements.</param>
         /// <returns>A GUID that uniquely represents the combination of the provided key parts.</returns>
         public Guid CreateKey(params object[] keyParts);
+
+        /// <summary>
+        /// Clears all entries from the cache, removing any stored data and forcing subsequent requests to retrieve
+        /// fresh information.
+        /// </summary>
+        /// <remarks>Use this method to ensure that outdated or invalid data is removed from the cache.
+        /// After calling this method, any attempt to access cached data will result in a cache miss until new data is
+        /// stored. This operation may impact performance if the cache is large or frequently accessed.</remarks>
+        public void EvictCache();
     }
 }

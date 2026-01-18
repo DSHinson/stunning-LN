@@ -1,12 +1,8 @@
-﻿using LexisNexis.Common.CQRS.Command;
+﻿using LexisNexis.Common.Cache;
+using LexisNexis.Common.CQRS.Command;
 using LexisNexis.Common.Result;
 using LexisNexis.DAL.Models;
 using LexisNexis.DAL.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LexisNexis.BLL.Products
 {
@@ -14,11 +10,13 @@ namespace LexisNexis.BLL.Products
     {
         private readonly IReadRepository<Product, int> _readRepo;
         private readonly IWriteRepository<Product, int> _writeRepo;
+        private readonly ICacheService _cacheService;
 
-        public DeleteProductEventHandler(IReadRepository<Product, int> readRepo, IWriteRepository<Product, int> writeRepo)
+        public DeleteProductEventHandler(IReadRepository<Product, int> readRepo, IWriteRepository<Product, int> writeRepo, ICacheService cacheService)
         {
-            _readRepo = readRepo;
-            _writeRepo = writeRepo;
+            _readRepo = readRepo ?? throw new ArgumentNullException(nameof(readRepo));
+            _writeRepo = writeRepo ?? throw new ArgumentNullException(nameof(writeRepo));
+            _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         }
 
         public async Task<Result> HandleAsync(DeleteProductEvent command)
@@ -28,7 +26,14 @@ namespace LexisNexis.BLL.Products
                 return ResultHelpers.ToFailure<bool>("Invalid product id");
             }
 
-            return await _writeRepo.RemoveAsync(command.Id);
+            Result result = await _writeRepo.RemoveAsync(command.Id);
+
+            if (result is Result.Success)
+            {
+                _cacheService.EvictCache();
+            }
+            
+            return result;
         }
     }
 

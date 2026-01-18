@@ -1,4 +1,5 @@
-﻿using LexisNexis.Common.CQRS.Command;
+﻿using LexisNexis.Common.Cache;
+using LexisNexis.Common.CQRS.Command;
 using LexisNexis.Common.Result;
 using LexisNexis.DAL.Models;
 using LexisNexis.DAL.Storage;
@@ -8,8 +9,10 @@ namespace LexisNexis.BLL.Products
     internal class UpdateProductEventHandler : ICommandHandler<UpdateProductEvent, Result<Product>>
     {
         IWriteRepository<Product, int> _repo;
-        public UpdateProductEventHandler(IWriteRepository<Product, int> repo)
+        ICacheService _cacheService;
+        public UpdateProductEventHandler(IWriteRepository<Product, int> repo, ICacheService cacheService)
         {
+            _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
             _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         }
         public async Task<Result<Product>> HandleAsync(UpdateProductEvent command)
@@ -20,7 +23,7 @@ namespace LexisNexis.BLL.Products
                 return ResultHelpers.ToFailure<Product>("Invalid product data");
             }
 
-            return await _repo.UpdateAsync(new Product
+            var result = await _repo.UpdateAsync(new Product
             {
                 Id = command.Id,
                 Name = command.Name,
@@ -31,6 +34,12 @@ namespace LexisNexis.BLL.Products
                 CategoryId = command.CategoryId,
                 UpdatedAt = DateTime.UtcNow
             });
+
+            if (result is Result<Product>.Success)
+            {
+                _cacheService.EvictCache();
+            }
+            return result;
         }
     }
 }

@@ -13,6 +13,7 @@ namespace LexisNexis.Common.Cache
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
+
         public Guid CreateKey(params object[] keyParts)
         {
             if (keyParts == null || keyParts.Length == 0)
@@ -54,6 +55,29 @@ namespace LexisNexis.Common.Cache
             }
         }
 
+        public void EvictCache()
+        {
+            if (_cache is MemoryCache memoryCache)
+            {
+                memoryCache.Compact(1.0); // Removes 100% of entries
+            }
+        }
+
+        public CacheContainer<T> GetOrCreateCacheContainer<T>(Guid key)
+        {
+            return _cache.GetOrCreate(key, entry => new CacheContainer<T>(), new MemoryCacheEntryOptions() { Size = 1 });
+        }
+
+        public void Remove(Guid key)
+        {
+            _cache.Remove(key);
+        }
+
+        public void Set<T>(Guid key, T value, TimeSpan cacheDuration)
+        {
+          _cache.Set(key, value, new MemoryCacheEntryOptions() { AbsoluteExpirationRelativeToNow = cacheDuration, Size = 1});
+        }
+
         private static int GetByteLength(object value)
         {
             return value switch
@@ -84,21 +108,6 @@ namespace LexisNexis.Common.Cache
                 string s => Encoding.UTF8.GetBytes(s),
                 _ => Encoding.UTF8.GetBytes((value ?? "").ToString()!)
             };
-        }
-
-        public CacheContainer<T> GetOrCreateCacheContainer<T>(Guid key)
-        {
-            return _cache.GetOrCreate(key, entry => new CacheContainer<T>(), new MemoryCacheEntryOptions() { Size = 1 });
-        }
-
-        public void Remove(Guid key)
-        {
-            _cache.Remove(key);
-        }
-
-        public void Set<T>(Guid key, T value, TimeSpan cacheDuration)
-        {
-          _cache.Set(key, value, new MemoryCacheEntryOptions() { AbsoluteExpirationRelativeToNow = cacheDuration, Size = 1});
         }
     }
 }
