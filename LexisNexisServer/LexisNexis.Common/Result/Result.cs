@@ -26,7 +26,13 @@ namespace LexisNexis.Common.Result
     /// <typeparam name="T">The type of the value returned on success.</typeparam>
     public abstract record Result<T>: Result
     {
-        private Result() { }
+        private Result()
+        {
+            if (typeof(Result).IsAssignableFrom(typeof(T)))
+            {
+                throw new InvalidOperationException("T cannot be a Result type.");
+            }
+        }
         public new sealed record Success(T Data) : Result<T>;
         public new sealed record Failure(string FailureMessage) : Result<T>;
     }
