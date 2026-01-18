@@ -4,6 +4,8 @@ using LexisNexis.Common.CQRS.Query;
 using LexisNexis.Common.Filters;
 using LexisNexis.Common.Result;
 using LexisNexis.DAL.Models;
+using LexisNexis.DAL.Storage;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace LexisNexis.BLL.Products
@@ -12,15 +14,19 @@ namespace LexisNexis.BLL.Products
     {
         private readonly ISearchEngine<Category, int> _categorySearchEngine;
         private readonly ISearchEngine<Product, int> _productSearchEngine;
+        private readonly IReadRepository<Category, int> _categoryRepository;
         private readonly ICacheService _cacheService;
-        private readonly TimeSpan _cacheDuration = TimeSpan.FromSeconds(60);
+        private readonly TimeSpan _cacheDuration = TimeSpan.FromSeconds(1);
 
-        public GetProductsEventHandler(ICacheService cacheService, ISearchEngine<Category, int> categorySearchEngine, ISearchEngine<Product, int> productSearchEngine)
+        public GetProductsEventHandler(ICacheService cacheService, ISearchEngine<Category, int> categorySearchEngine, ISearchEngine<Product, int> productSearchEngine, IReadRepository<Category, int> categoryRepository)
         {
             _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
             _categorySearchEngine = categorySearchEngine ?? throw new ArgumentNullException(nameof(categorySearchEngine));
             _productSearchEngine = productSearchEngine ?? throw new ArgumentNullException(nameof(productSearchEngine));
+            _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
+
+
 
         public async Task<Result<IEnumerable<Product>>> HandleAsync(GetProductsEvent query)
         {
@@ -75,8 +81,24 @@ namespace LexisNexis.BLL.Products
                 // If a specific category is supplied, filter **strictly by that category**
                 if (query.Category is not null)
                 {
-                    Expression<Func<Product, bool>> categoryFilter = p => p.CategoryId == query.Category;
-                    predicate = categoryFilter;
+                    // Get all child categories recursively
+                    List<Category> recursiveCategoryList = await GetChildCategoriesRecursiveAsync(query.Category.Value);
+
+                    if (recursiveCategoryList.Count > 0)
+                    {
+                        // Build a list of IDs including the parent category itself
+                        var categoryIds = recursiveCategoryList.Select(x => x.Id).Append(query.Category.Value).ToList();
+
+                        // Create expression filter
+                        Expression<Func<Product, bool>> categoryFilter = p => categoryIds.Contains(p.CategoryId);
+                        predicate = categoryFilter;
+                    }
+                    else
+                    {
+                        // No children, just filter by this category
+                        Expression<Func<Product, bool>> categoryFilter = p => p.CategoryId == query.Category.Value;
+                        predicate = categoryFilter;
+                    }
                 }
 
                 // If no specific category was supplied, but category search found matches
@@ -123,6 +145,40 @@ namespace LexisNexis.BLL.Products
             {
                 cacheResult.Release();
             }
+        }
+
+        /// <summary>
+        /// Recursively gets categories up to a max depth.
+        /// </summary>
+        /// <param name="parentId">The parent category to start from.</param>
+        /// <param name="currentDepth">Current recursion depth (default 0).</param>
+        /// <param name="maxDepth">Maximum recursion depth (default 3).</param>
+        private async Task<List<Category>> GetChildCategoriesRecursiveAsync(int parentId, int currentDepth = 0, int maxDepth = 3)
+        {
+            if (currentDepth >= maxDepth)
+            {
+                return new List<Category>();
+            }
+
+            // Query children of the current category
+            Result<IEnumerable<Category>> childrenResult = await _categoryRepository.GetAllAsync(c => c.ParentCategoryId == parentId);
+
+            if (childrenResult is Result<IEnumerable<Category>>.Failure)
+            {
+                return new List<Category>();
+            }
+
+            var children = ((Result<IEnumerable<Category>>.Success)childrenResult).Data.ToList();
+            var allDescendants = new List<Category>(children);
+
+            // Recurse for each child
+            foreach (var child in children)
+            {
+                var subChildren = await GetChildCategoriesRecursiveAsync(child.Id, currentDepth + 1, maxDepth);
+                allDescendants.AddRange(subChildren);
+            }
+
+            return allDescendants;
         }
     }
 }

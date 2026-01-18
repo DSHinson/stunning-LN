@@ -2,8 +2,6 @@
 using LexisNexis.BLL.Products;
 using LexisNexis.Common.CQRS;
 using LexisNexis.Common.DTO;
-using LexisNexis.Common.Result;
-using LexisNexis.DAL.Models;
 
 namespace LexisNexis.API.Products
 {
