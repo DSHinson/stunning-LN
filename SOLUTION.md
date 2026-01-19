@@ -16,7 +16,7 @@ The solution prioritizes **auditability** and **compile-time safety**, trading d
 
 **Choice**: NgRx (which uses RxJS under the hood)
 
-**Rationale**: Demonstrates senior-level Angular expertise while fulfilling the specification. Provides TypeScript type safety, predictable state flow, time-travel debugging, and centralized error handling at the cost of additional boilerplate (actions, reducers, effects, selectors).
+**Rationale**: Demonstrates state machine design pattern understanding and provides TypeScript type safety, predictable state flow, and centralized error handling at the cost of additional boilerplate (actions, reducers, effects, selectors).
 
 ## Backend Event Sourcing (CQRS)
 
